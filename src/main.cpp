@@ -7,34 +7,26 @@ int main(int ac, char **av) {
 		return 1;
 	}
 
-	SDL_Event event;
-	bool running = true;
-
-	// game loop
-	while (running) {
-		while (SDL_PollEvent(&event)) {
-			if (event.type == SDL_QUIT) {
-				SDL_DestroyRenderer(windowData.renderer);
-				SDL_DestroyWindow(windowData.window);
-				SDL_Quit();
-				return 0;
-			}
-
-			if (event.type == SDL_KEYDOWN) {
-				if (event.key.keysym.sym == SDLK_ESCAPE) {
-					running = false;
-				}
-			}
-		}
-
-		SDL_SetRenderDrawColor(windowData.renderer, 0, 0, 0, 255);
-		SDL_RenderClear(windowData.renderer);
-
-		// Render your game objects here
-
-		SDL_RenderPresent(windowData.renderer);
+	TTF_Font* font = TTF_OpenFont("assets/fonts/test.ttf", 24);
+	if (!font) {
+		std::cerr << "Failed to load font! TTF_Error: " << TTF_GetError() << std::endl;
+		sdl_clean(windowData);
+		return 1;
 	}
 
+	GameState currentState = GameState::MENU;
+
+	while (currentState != GameState::EXIT) {
+		switch(currentState) {
+			case GameState::MENU:
+				currentState = handle_main_menu(windowData, font);
+				break;
+			case GameState::CONTROLS:
+				currentState = handle_controls(windowData, font);
+				break;
+		}
+	}
+	TTF_CloseFont(font);
 	sdl_clean(windowData);
 	return 0;
 }

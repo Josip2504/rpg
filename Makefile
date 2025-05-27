@@ -1,7 +1,7 @@
 # Makefile
 CC=g++
 CFLAGS=$(shell sdl2-config --cflags)
-LDFLAGS=$(shell sdl2-config --libs) -lmingw32
+LDFLAGS=$(shell sdl2-config --libs) -lSDL2_ttf -lmingw32
 SRC= src/*.cpp
 OUT=rpg.exe
 

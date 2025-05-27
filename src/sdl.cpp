@@ -9,6 +9,12 @@ bool sdl_init(SDL_WindowData &windowData) {
 		return false;
 	}
 
+	if (TTF_Init() == -1) {
+		std::cerr << "SDL_ttf could not initialize! TTF_Error: " << TTF_GetError() << std::endl;
+		SDL_Quit();
+		return false;
+	}
+
 	windowData.window = SDL_CreateWindow("SDL Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, S_WIDTH, S_HEIGHT, SDL_WINDOW_SHOWN);
 	if (!windowData.window) {
 		std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
