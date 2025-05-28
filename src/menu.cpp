@@ -36,29 +36,31 @@ GameState handle_main_menu(SDL_WindowData &windowData, TTF_Font* font) {
 				currentState = GameState::EXIT;
 			}
 
-			if (event.type == SDL_MOUSEBUTTONDOWN) {
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					if (event.button.button == SDL_BUTTON_LEFT) {
-						int mouseX = event.button.x;
-						int mouseY = event.button.y;
-						
-						startButton.isPressed = is_mouse_over(startButton, mouseX, mouseY);
-						controlsButton.isPressed = is_mouse_over(controlsButton, mouseX, mouseY);
-						exitButton.isPressed = is_mouse_over(exitButton, mouseX, mouseY);
-					}
-				}
+			if (event.type == SDL_MOUSEMOTION) {
+				startButton.isHovered = is_mouse_over(startButton, event.motion.x, event.motion.y);
+				controlsButton.isHovered = is_mouse_over(controlsButton, event.motion.x, event.motion.y);
+				exitButton.isHovered = is_mouse_over(exitButton, event.motion.x, event.motion.y);
 			}
 
-			if (event.type == SDL_MOUSEBUTTONUP) {
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					if (startButton.isPressed) return GameState::GAME;
-					if (controlsButton.isPressed) return GameState::CONTROLS;
-					if (exitButton.isPressed) {
-						running = false;
-						currentState = GameState::EXIT;
-					}
-					exitButton.isPressed = false;
+			if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+					startButton.isPressed = is_mouse_over(startButton, event.motion.x, event.motion.y);
+					controlsButton.isPressed = is_mouse_over(controlsButton, event.motion.x, event.motion.y);
+					exitButton.isPressed = is_mouse_over(exitButton, event.motion.x, event.motion.y);
+			}
+
+			if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
+				if (startButton.isPressed && startButton.isHovered) return GameState::GAME;
+				if (controlsButton.isPressed && controlsButton.isHovered) return GameState::CONTROLS;
+				if (exitButton.isPressed && exitButton.isHovered) {
+					running = false;
+					currentState = GameState::EXIT;
 				}
+				exitButton.isPressed = false;
+			}
+			if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
+				if (startButton.isPressed && !startButton.isHovered) startButton.isPressed = false;
+				if (controlsButton.isPressed && !controlsButton.isHovered) controlsButton.isPressed = false;
+				if (exitButton.isPressed && !exitButton.isHovered) exitButton.isPressed = false;
 			}
 		}
 
@@ -78,65 +80,80 @@ GameState handle_main_menu(SDL_WindowData &windowData, TTF_Font* font) {
 	return currentState;
 }
 
-// GameState handle_controls(SDL_WindowData &windowData, TTF_Font* font) {
-// 	SDL_Event event;
-// 	GameState currentState = GameState::CONTROLS;
+GameState handle_controls(SDL_WindowData &windowData, TTF_Font* font) {
+	if (!font) return GameState::EXIT;
 
-// 	Button backButton = {{300, 450, 200, 50}, {255, 200, 0, 255}, "Back", false};
+	SDL_Event event;
+	GameState currentState = GameState::CONTROLS;
 
-// 	std::vector<std::string> controlsText = {
-// 		"Controls:",
-// 		"W - Move Up",
-// 		"A - Move Left",
-// 		"S - Move Down",
-// 		"D - Move Right",
-// 		"ESC - Pause Game"
-// 	};
+	Button backButton;
+	backButton.isPressed = false;
+	backButton.rect = {S_WIDTH / 2 - 100, S_HEIGHT - 100, 200, 50};
+	backButton.text = "Back";
+	if (!load_button_textures(backButton, windowData.renderer, 
+		"assets/UI/Buttons/Button_Blue_3Slides.png", 
+		"assets/UI/Buttons/Button_Blue_3Slides_Pressed.png")) {
+		return GameState::EXIT;
+	}
 
-// 	while (currentState == GameState::CONTROLS) {
-// 		while (SDL_PollEvent(&event)) {
-// 			if (event.type == SDL_QUIT) {
-// 				return GameState::EXIT;
-// 			}
+	std::vector<std::string> controlsText = {
+		"Controls:",
+		"W - Move Up",
+		"A - Move Left",
+		"S - Move Down",
+		"D - Move Right",
+		"ESC - Pause Game"
+	};
 
-// 			if (event.type == SDL_MOUSEMOTION) {
-// 				backButton.isHovered = is_mouse_over(backButton, event.motion.x, event.motion.y);
-// 			}
+	while (currentState == GameState::CONTROLS) {
+		while (SDL_PollEvent(&event)) {
+			if (event.type == SDL_QUIT) {
+				return GameState::EXIT;
+			}
 
-// 			if (event.type == SDL_MOUSEBUTTONDOWN && 
-// 				event.button.button == SDL_BUTTON_LEFT && 
-// 				is_mouse_over(backButton, event.button.x, event.button.y)) {
-// 				return GameState::MENU;
-// 			}
-// 		}
+			if (event.type == SDL_MOUSEMOTION) {
+				backButton.isHovered = is_mouse_over(backButton, event.motion.x, event.motion.y);
+			}
 
-// 		// Rendering
-// 		SDL_SetRenderDrawColor(windowData.renderer, 78, 181, 181, 255);
-// 		SDL_RenderClear(windowData.renderer);
+			if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+				backButton.isPressed = is_mouse_over(backButton, event.button.x, event.button.y);
+			}
 
-// 		SDL_Color textColor = {255, 255, 255, 255};
-// 		int yOffset = 150;
-// 		for (const auto& line : controlsText) {
-// 			SDL_Surface* textSurface = TTF_RenderText_Solid(font, line.c_str(), textColor);
-// 			if (textSurface) {
-// 				SDL_Texture* textTexture = SDL_CreateTextureFromSurface(windowData.renderer, textSurface);
-// 				if (textTexture) {
-// 					int textWidth = textSurface->w;
-// 					int textHeight = textSurface->h;
-// 					SDL_Rect textRect = {S_WIDTH / 2 - textWidth / 2, yOffset, textWidth, textHeight};
-// 					SDL_RenderCopy(windowData.renderer, textTexture, nullptr, &textRect);
-// 					SDL_DestroyTexture(textTexture);
-// 				}
-// 				SDL_FreeSurface(textSurface);
-// 			}
-// 			yOffset += 30;
-// 		}
+			if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
+				if (backButton.isPressed && backButton.isHovered) {
+					currentState = GameState::MENU;
+				}
+				backButton.isPressed = false;
+			}
+		}
 
-// 		render_button(windowData.renderer, backButton, font);
-// 		render_cursor(windowData);
+		// Rendering
+		SDL_SetRenderDrawColor(windowData.renderer, 78, 181, 181, 255);
+		SDL_RenderClear(windowData.renderer);
 
-// 		SDL_RenderPresent(windowData.renderer);
-// 	}
+		// Render controls text
+		SDL_Color textColor = {255, 255, 255, 255};
+		int yOffset = 150;
+		for (const auto& line : controlsText) {
+			SDL_Surface* textSurface = TTF_RenderText_Solid(font, line.c_str(), textColor);
+			if (textSurface) {
+				SDL_Texture* textTexture = SDL_CreateTextureFromSurface(windowData.renderer, textSurface);
+				if (textTexture) {
+					int textWidth = textSurface->w;
+					SDL_Rect textRect = {S_WIDTH / 2 - textWidth / 2, yOffset, textWidth, textSurface->h};
+					SDL_RenderCopy(windowData.renderer, textTexture, nullptr, &textRect);
+					SDL_DestroyTexture(textTexture);
+				}
+				SDL_FreeSurface(textSurface);
+			}
+			yOffset += 30;
+		}
 
-// 	return currentState;
-// }
+		render_button(windowData.renderer, backButton, font);
+		render_cursor(windowData);
+
+		SDL_RenderPresent(windowData.renderer);
+	}
+
+	return currentState;
+}

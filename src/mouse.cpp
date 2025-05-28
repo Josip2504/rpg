@@ -51,5 +51,10 @@ GameState	ft_buttons(Button &startButton, Button &controlsButton, Button &exitBu
 		"assets/UI/Buttons/Button_Blue_3Slides_Pressed.png")) {
 			return GameState::EXIT;
 	}
+
+	startButton.isPressed = false;
+	controlsButton.isPressed = false;
+	exitButton.isPressed = false;
+	
 	return currentState;
 }

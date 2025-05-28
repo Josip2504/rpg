@@ -23,7 +23,7 @@ int main(int ac, char **av) {
 				currentState = handle_main_menu(windowData, font);
 				break;
 			case GameState::CONTROLS:
-				// currentState = handle_controls(windowData, font);
+				currentState = handle_controls(windowData, font);
 				break;
 		}
 	}
