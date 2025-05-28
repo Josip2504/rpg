@@ -29,6 +29,20 @@ GameState handle_main_menu(SDL_WindowData &windowData, TTF_Font* font) {
 	Button startButton, controlsButton, exitButton;
 	currentState = ft_buttons(startButton, controlsButton, exitButton, currentState, windowData);
 
+	SDL_DisplayMode dm;
+	SDL_GetCurrentDisplayMode(0, &dm);
+
+	SDL_Texture *titleTexture = IMG_LoadTexture(windowData.renderer, "assets/UI/Ribbons/Ribbon_Blue_3Slides.png");
+	SDL_Surface *titleSurface = TTF_RenderText_Blended(font, "GAME", {255, 255, 255, 255});
+	SDL_Rect panelRect = {0, 0, dm.w, dm.h - 200} ;
+	SDL_Rect titleRect = {
+		(panelRect.w - titleSurface->w * 6) / 2,
+		(panelRect.h - titleSurface->h * 3) / 2 - 100,
+		titleSurface->w * 6,
+		titleSurface->h * 3
+	};
+
+
 	while (running) {
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT) {
@@ -71,6 +85,7 @@ GameState handle_main_menu(SDL_WindowData &windowData, TTF_Font* font) {
 		render_button(windowData.renderer, startButton, font);
 		render_button(windowData.renderer, controlsButton, font);
 		render_button(windowData.renderer, exitButton, font);
+		SDL_RenderCopy(windowData.renderer, titleTexture, NULL, &titleRect);
 
 		render_cursor(windowData);
 
@@ -86,9 +101,12 @@ GameState handle_controls(SDL_WindowData &windowData, TTF_Font* font) {
 	SDL_Event event;
 	GameState currentState = GameState::CONTROLS;
 
+	SDL_DisplayMode dm;
+	SDL_GetCurrentDisplayMode(0, &dm);
+
 	Button backButton;
 	backButton.isPressed = false;
-	backButton.rect = {S_WIDTH / 2 - 100, S_HEIGHT - 100, 200, 50};
+	backButton.rect = {(dm.w - 200) / 2, (dm.h + 180) / 2, 200, 50};
 	backButton.text = "Back";
 	if (!load_button_textures(backButton, windowData.renderer, 
 		"assets/UI/Buttons/Button_Blue_3Slides.png", 
@@ -140,7 +158,12 @@ GameState handle_controls(SDL_WindowData &windowData, TTF_Font* font) {
 				SDL_Texture* textTexture = SDL_CreateTextureFromSurface(windowData.renderer, textSurface);
 				if (textTexture) {
 					int textWidth = textSurface->w;
-					SDL_Rect textRect = {S_WIDTH / 2 - textWidth / 2, yOffset, textWidth, textSurface->h};
+					SDL_Rect textRect = {
+						(dm.w - textWidth) / 2,
+						yOffset + 100,
+						textWidth,
+						textSurface->h
+					};
 					SDL_RenderCopy(windowData.renderer, textTexture, nullptr, &textRect);
 					SDL_DestroyTexture(textTexture);
 				}

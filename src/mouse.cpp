@@ -32,9 +32,11 @@ bool load_button_textures(Button& btn, SDL_Renderer* renderer,
 }
 
 GameState	ft_buttons(Button &startButton, Button &controlsButton, Button &exitButton, GameState currentState, SDL_WindowData &windowData) {
-	startButton.rect = {100, 100, 200, 50};
-	controlsButton.rect = {100, 200, 200, 50};
-	exitButton.rect = {100, 300, 200, 50};
+	SDL_DisplayMode dm;
+	SDL_GetCurrentDisplayMode(0, &dm);
+	startButton.rect = {(dm.w - 200) / 2, (dm.h - 250) / 2, 200, 50};
+	controlsButton.rect = {(dm.w - 200) / 2, (dm.h - 50) / 2, 200, 50};
+	exitButton.rect = {(dm.w - 200) / 2, (dm.h + 180) / 2, 200, 50};
 
 	startButton.text = "Start Game";
 	controlsButton.text = "Controls";
