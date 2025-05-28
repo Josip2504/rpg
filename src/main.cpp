@@ -3,6 +3,7 @@
 int main(int ac, char **av) {
 	SDL_WindowData windowData;
 
+
 	if (!sdl_init(windowData)) {
 		return 1;
 	}
@@ -22,7 +23,7 @@ int main(int ac, char **av) {
 				currentState = handle_main_menu(windowData, font);
 				break;
 			case GameState::CONTROLS:
-				currentState = handle_controls(windowData, font);
+				// currentState = handle_controls(windowData, font);
 				break;
 		}
 	}

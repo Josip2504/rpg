@@ -30,10 +30,24 @@ bool sdl_init(SDL_WindowData &windowData) {
 		return false;
 	}
 
+	windowData.cursorTexture = IMG_LoadTexture(windowData.renderer, "assets/UI/Pointers/01.png");
+	if (!windowData.cursorTexture) {
+		std::cerr << "Failed to load cursor texture! IMG_Error: " << IMG_GetError() << std::endl;
+		SDL_DestroyRenderer(windowData.renderer);
+		SDL_DestroyWindow(windowData.window);
+		SDL_Quit();
+		return false;
+	}
+	SDL_QueryTexture(windowData.cursorTexture, nullptr, nullptr, &windowData.cursorWidth, &windowData.cursorHeight);
+	SDL_ShowCursor(SDL_FALSE); // Hide the default cursor
+
 	return true;
 }
 
 void sdl_clean(SDL_WindowData &windowData) {
+	if (windowData.cursorTexture) {
+		SDL_DestroyTexture(windowData.cursorTexture);
+	}
 	SDL_DestroyRenderer(windowData.renderer);
 	SDL_DestroyWindow(windowData.window);
 	SDL_Quit();
